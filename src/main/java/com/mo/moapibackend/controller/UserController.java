@@ -8,6 +8,7 @@ import com.mo.moapibackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/user")
 @Slf4j
+@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
 public class UserController {
 
     @Resource

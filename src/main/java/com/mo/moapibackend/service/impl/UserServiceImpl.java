@@ -31,19 +31,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 
     @Override
-    public Long userRegister(String password, String userAccount,String checkPassword){
+    public Long userRegister(String userAccount, String userPassword,String checkPassword){
         //参数非空校验
-        if (StringUtils.isAnyEmpty(checkPassword, password, userAccount)) {
+        if (StringUtils.isAnyEmpty(checkPassword, userPassword, userAccount)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"请求参数为空");
         }
         //参数合理校验
-        if (userAccount.length() < 6 || userAccount.length() > 16) {
+        if (userAccount.length() < 4 || userAccount.length() > 16) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户账号长度不合理");
         }
-        if (password.length() < 6 || checkPassword.length() < 6) {
+        if (userPassword.length() < 6 || checkPassword.length() < 6) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户密码或校验密码长度不合理");
         }
-        if (!password.equals(checkPassword)) {
+        if (!userPassword.equals(checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"两次密码不一致");
         }
         //校验userAccount中是否含有特殊字符
@@ -62,7 +62,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         //如果userAccount不存在
         //对密码进行加密
-        String safetyPassword = DigestUtil.md5Hex((PASSWORD_SALT + password).getBytes());
+        String safetyPassword = DigestUtil.md5Hex((PASSWORD_SALT + userPassword).getBytes());
         //新建用户，插入用户
         User insertUser = new User();
         insertUser.setUserAccount(userAccount);
@@ -72,6 +72,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"插入失败");
         }
         return insertUser.getId();
+    }
+
+    @Override
+    public User userLogin(String userAccount, String userPassword) {
+        if (StringUtils.isAnyEmpty(userAccount, userPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"")
+        }
+
     }
 }
 

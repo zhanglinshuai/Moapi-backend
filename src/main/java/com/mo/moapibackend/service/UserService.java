@@ -11,7 +11,20 @@ import org.springframework.stereotype.Service;
 */
 public interface UserService extends IService<User> {
 
-
+    /**
+     * 用户注册
+     * @param password
+     * @param userAccount
+     * @param checkPassword
+     * @return
+     */
     Long userRegister(String password,String userAccount,String checkPassword);
 
+    /**
+     * 用户登录
+     * @param userAccount
+     * @param userPassword
+     * @return
+     */
+    User userLogin(String userAccount,String userPassword);
 }
