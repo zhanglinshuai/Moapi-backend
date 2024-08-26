@@ -2,6 +2,7 @@ package com.mo.moapibackend.service;
 
 import com.mo.moapibackend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.stereotype.Service;
 
 /**
 * @author 86175
@@ -9,5 +10,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-08-26 21:21:06
 */
 public interface UserService extends IService<User> {
+
+
+    Long userRegister(String password,String userAccount,String checkPassword);
 
 }

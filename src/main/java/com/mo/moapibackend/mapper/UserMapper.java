@@ -2,6 +2,7 @@ package com.mo.moapibackend.mapper;
 
 import com.mo.moapibackend.model.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author 86175
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2024-08-26 21:21:06
 * @Entity com.mo.moapibackend.model.entity.User
 */
+@Mapper
 public interface UserMapper extends BaseMapper<User> {
 
 }
