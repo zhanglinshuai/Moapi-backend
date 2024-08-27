@@ -1,8 +1,13 @@
 package com.mo.moapibackend.service;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import com.mo.moapibackend.model.dto.UserDTO;
 import com.mo.moapibackend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author 86175
@@ -26,5 +31,19 @@ public interface UserService extends IService<User> {
      * @param userPassword
      * @return
      */
-    User userLogin(String userAccount,String userPassword);
+    UserDTO userLogin(String userAccount, String userPassword,HttpServletRequest request);
+
+    /**
+     * 获取当前登录用户
+     * @param request
+     * @return
+     */
+    User getCurrentUser(HttpServletRequest request);
+
+    /**
+     * 获取脱敏后的用户
+     * @param originUser
+     * @return
+     */
+    User getSafetyUser(User originUser);
 }

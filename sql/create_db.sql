@@ -1,3 +1,4 @@
+
 -- auto-generated definition
 create table user
 (
@@ -12,6 +13,7 @@ create table user
     userRole      varchar(256)                       null comment '用户角色',
     createTime    datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime    datetime default CURRENT_TIMESTAMP not null comment '更新时间',
-    isDelete      tinyint  default 0                 not null comment '逻辑删除  0-不删除  1-删除'
+    isDelete      tinyint  default 0                 not null comment '逻辑删除  0-不删除  1-删除',
+    userAvatar    varchar(1024)                      null comment '用户头像'
 )
     comment '用户表';

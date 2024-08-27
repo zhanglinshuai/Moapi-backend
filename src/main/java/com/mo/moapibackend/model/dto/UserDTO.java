@@ -1,18 +1,20 @@
-package com.mo.moapibackend.model.entity;
+package com.mo.moapibackend.model.dto;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
- * 用户表
- * @TableName user
+ * 用户传输对象
  */
-@TableName(value ="user")
 @Data
-public class User implements Serializable {
+public class UserDTO implements Serializable {
+
+    private static final long serialVersionUID = -1423301449852622355L;
     /**
      * 用户id
      */
@@ -28,12 +30,6 @@ public class User implements Serializable {
      * 用户名称
      */
     private String userName;
-
-    /**
-     * 用户密码
-     */
-    private String userPassword;
-
     /**
      * accessKey
      */
@@ -73,7 +69,4 @@ public class User implements Serializable {
      */
     @TableLogic
     private Integer isDelete;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

@@ -1,20 +1,28 @@
 package com.mo.moapibackend.service.impl;
+import java.util.Date;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.http.HttpRequest;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
+import com.mo.moapibackend.exception.ResultUtils;
+import com.mo.moapibackend.model.dto.UserDTO;
 import com.mo.moapibackend.model.entity.User;
 import com.mo.moapibackend.service.UserService;
 import com.mo.moapibackend.mapper.UserMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.mo.moapibackend.commons.UserConstants.LOGIN_STATUS;
 import static com.mo.moapibackend.commons.UserConstants.PASSWORD_SALT;
 
 /**
@@ -57,7 +65,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("userAccount", userAccount);
         User user = userMapper.selectOne(userQueryWrapper);
-        if (user != null) {
+        if (user!=null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户账号已存在，无法重复");
         }
         //如果userAccount不存在
@@ -75,11 +83,82 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public User userLogin(String userAccount, String userPassword) {
+    public UserDTO userLogin(String userAccount, String userPassword,HttpServletRequest request) {
+        //非空判断
         if (StringUtils.isAnyEmpty(userAccount, userPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"")
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号或密码为空");
         }
+        if (request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //参数合理判断
+        if (userAccount.length() < 4 || userAccount.length() > 16) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户账号长度不合理");
+        }
+        if (userPassword.length()<6){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户密码长度不合理");
+        }
+        //校验userAccount中是否含有特殊字符
+        String regEx="[\\u00A0\\s\"`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        Pattern compile = Pattern.compile(regEx);
+        Matcher matcher = compile.matcher(userAccount);
+        if (matcher.find()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户账号中含有特殊字符");
+        }
+        //对密码进行加密
+        String safetyPassword = DigestUtil.md5Hex((PASSWORD_SALT + userPassword).getBytes());
+        //判断数据库中是否含有此账号
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("userAccount", userAccount);
+        userQueryWrapper.eq("userPassword", safetyPassword);
+        User user = userMapper.selectOne(userQueryWrapper);
+        Long userId = user.getId();
+        if (userId == null || userId<=0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"没有该用户信息，请先注册");
+        }
+        UserDTO userDTO = new UserDTO();
+        BeanUtils.copyProperties(user,userDTO);
+        //将用户登录态存储到session中
+        request.getSession().setAttribute(LOGIN_STATUS,userDTO);
+        return userDTO;
+    }
 
+    @Override
+    public User getCurrentUser(HttpServletRequest request) {
+        if (request==null){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"用户未登录");
+        }
+        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
+        if (attribute==null){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"用户未登录");
+        }
+        UserDTO userDTO = (UserDTO) attribute;
+        Long id = userDTO.getId();
+        User user = userMapper.selectById(id);
+        if (user==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户信息错误");
+        }
+        return getSafetyUser(user);
+
+    }
+
+    @Override
+    public User getSafetyUser(User originUser) {
+        if (originUser==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户信息为空");
+        }
+        User user = new User();
+        user.setId(originUser.getId());
+        user.setUserAccount(originUser.getUserAccount());
+        user.setUserName(originUser.getUserName());
+        user.setAccessKey(originUser.getAccessKey());
+        user.setSecretKey(originUser.getSecretKey());
+        user.setUserIntroduce(originUser.getUserIntroduce());
+        user.setUserRole(originUser.getUserRole());
+        user.setCreateTime(originUser.getCreateTime());
+        user.setUpdateTime(originUser.getUpdateTime());
+        user.setIsDelete(originUser.getIsDelete());
+        return user;
     }
 }
 

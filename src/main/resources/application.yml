@@ -2,6 +2,9 @@ server:
   port: 8080
   servlet:
     context-path: /api
+    session:
+      cookie:
+        domain: localhost
 
 spring:
   application:
@@ -12,12 +15,6 @@ spring:
     username: root
     password: 123456
     url: jdbc:mysql://localhost:3306/api_db
-  #  redis配置
-  redis:
-    database: 0
-    host: localhost
-    port: 6379
-    username: root
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -37,4 +34,4 @@ springdoc:
     enabled: true  #是否启用接口文档
 knife4j:
   basic:
-    enable: true   #是否启用kni4j增强
+   enable: true   #是否启用kni4j增强
