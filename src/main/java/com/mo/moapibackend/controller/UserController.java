@@ -41,17 +41,17 @@ public class UserController {
     }
     @PostMapping("/login")
     @Operation(summary = "用户登录")
-    public BaseResponse<UserDTO> userLogin(String userAccount, String userPassword, HttpServletRequest request){
+    public BaseResponse<User> userLogin(String userAccount, String userPassword, HttpServletRequest request){
         //参数非空判断
         if (StringUtils.isAnyEmpty(userAccount,userPassword)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
         }
         //调用业务
-        UserDTO userDTO = userService.userLogin(userAccount, userPassword,request);
-        if (userDTO==null){
+        User user = userService.userLogin(userAccount, userPassword, request);
+        if (user==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"没有该用户信息，请先注册");
         }
-        return ResultUtils.success(userDTO);
+        return ResultUtils.success(user);
     }
 
     @GetMapping("/current")
@@ -66,4 +66,19 @@ public class UserController {
         }
         return ResultUtils.success(currentUser);
     }
+
+
+    @PostMapping("/exit")
+    @Operation(summary = "用户退出登录")
+    public BaseResponse<Boolean> userExit(HttpServletRequest request){
+        if (request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean result = userService.userExit(request);
+        if (!result){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"退出登录失败");
+        }
+        return ResultUtils.success(result);
+    }
+
 }

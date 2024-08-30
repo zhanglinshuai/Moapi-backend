@@ -83,7 +83,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public UserDTO userLogin(String userAccount, String userPassword,HttpServletRequest request) {
+    public User userLogin(String userAccount, String userPassword,HttpServletRequest request) {
         //非空判断
         if (StringUtils.isAnyEmpty(userAccount, userPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号或密码为空");
@@ -116,11 +116,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (userId == null || userId<=0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"没有该用户信息，请先注册");
         }
-        UserDTO userDTO = new UserDTO();
-        BeanUtils.copyProperties(user,userDTO);
+        User safetyUser = getSafetyUser(user);
         //将用户登录态存储到session中
-        request.getSession().setAttribute(LOGIN_STATUS,userDTO);
-        return userDTO;
+        request.getSession().setAttribute(LOGIN_STATUS,safetyUser);
+        return safetyUser;
     }
 
     @Override
@@ -132,8 +131,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (attribute==null){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"用户未登录");
         }
-        UserDTO userDTO = (UserDTO) attribute;
-        Long id = userDTO.getId();
+        User loginUser = (User) attribute;
+        Long id = loginUser.getId();
         User user = userMapper.selectById(id);
         if (user==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户信息错误");
@@ -159,6 +158,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUpdateTime(originUser.getUpdateTime());
         user.setIsDelete(originUser.getIsDelete());
         return user;
+    }
+
+    @Override
+    public boolean userExit(HttpServletRequest request) {
+        if (request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        request.getSession().removeAttribute(LOGIN_STATUS);
+        return true;
     }
 }
 

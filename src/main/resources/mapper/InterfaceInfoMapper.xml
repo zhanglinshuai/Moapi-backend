@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo.moapibackend.mapper.InterfaceInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.mo.moapibackend.model.entity.InterfaceInfo">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="userId" column="userId" jdbcType="INTEGER"/>
+            <result property="interfaceName" column="interfaceName" jdbcType="VARCHAR"/>
+            <result property="interfaceDescription" column="interfaceDescription" jdbcType="VARCHAR"/>
+            <result property="interfaceUrl" column="interfaceUrl" jdbcType="VARCHAR"/>
+            <result property="interfaceType" column="interfaceType" jdbcType="INTEGER"/>
+            <result property="interfaceParams" column="interfaceParams" jdbcType="VARCHAR"/>
+            <result property="interfaceStatus" column="interfaceStatus" jdbcType="INTEGER"/>
+            <result property="interfaceRequestHeader" column="interfaceRequestHeader" jdbcType="VARCHAR"/>
+            <result property="interfaceResponseHeader" column="interfaceResponseHeader" jdbcType="VARCHAR"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,userId,interfaceName,
+        interfaceDescription,interfaceUrl,interfaceType,
+        interfaceParams,interfaceStatus,interfaceRequestHeader,
+        interfaceResponseHeader,isDelete,createTime,
+        updateTime
+    </sql>
+</mapper>
