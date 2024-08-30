@@ -1,29 +1,21 @@
-package com.mo.moapibackend.model.entity;
+package com.mo.moapibackend.model.request.interfaceInfo;
 
-import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
- * 接口信息表
- * @TableName interface_info
+ * 上线接口的参数
  */
-@TableName(value ="interface_info")
 @Data
-public class InterfaceInfo implements Serializable {
-    /**
-     * 接口id
-     */
-    @TableId(type = IdType.AUTO)
-    private Integer id;
+public class OnLineInterfaceRequestParams implements Serializable {
+
+    private static final long serialVersionUID = 2130976778686990832L;
 
     /**
      * 创建接口的用户id
      */
     private Long userId;
-
     /**
      * 接口名称
      */
@@ -63,23 +55,4 @@ public class InterfaceInfo implements Serializable {
      * 接口响应头
      */
     private String interfaceResponseHeader;
-
-    /**
-     * 是否删除 0-不删除 1-删除
-     */
-    @TableLogic
-    private Integer isDelete;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

@@ -2,6 +2,8 @@ package com.mo.moapibackend.service.impl;
 import java.util.Date;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.crypto.SignUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpRequest;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -22,8 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.mo.moapibackend.commons.UserConstants.LOGIN_STATUS;
-import static com.mo.moapibackend.commons.UserConstants.PASSWORD_SALT;
+import static com.mo.moapibackend.commons.UserConstants.*;
 
 /**
 * @author 86175
@@ -71,10 +72,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //如果userAccount不存在
         //对密码进行加密
         String safetyPassword = DigestUtil.md5Hex((PASSWORD_SALT + userPassword).getBytes());
+        //给用户分配ak sk
+        String accessKey = DigestUtil.md5Hex((userAccount + ACCESS_KEY + RandomUtil.randomNumbers(4)).getBytes());
+        String secretKey = DigestUtil.md5Hex((userAccount + SECRET_KEY + RandomUtil.randomNumbers(6)).getBytes());
         //新建用户，插入用户
         User insertUser = new User();
         insertUser.setUserAccount(userAccount);
         insertUser.setUserPassword(safetyPassword);
+        insertUser.setAccessKey(accessKey);
+        insertUser.setSecretKey(secretKey);
         boolean save = this.save(insertUser);
         if (!save) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"插入失败");

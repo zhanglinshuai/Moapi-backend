@@ -27,7 +27,7 @@ create table interface_info
     interfaceName           varchar(256)                       null comment '接口名称',
     interfaceDescription    varchar(512)                       null comment '接口描述',
     interfaceUrl            varchar(512)                       null comment '接口路径',
-    interfaceType           int                                null comment '接口请求类型',
+    interfaceType           varchar(256)                       null comment '接口请求类型',
     interfaceParams         varchar(512)                       null comment '接口参数',
     interfaceStatus         int                                null comment '接口状态 0-关闭  1-打开',
     interfaceRequestHeader  varchar(256)                       null comment '接口请求头',

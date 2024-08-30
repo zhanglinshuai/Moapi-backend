@@ -10,7 +10,7 @@
             <result property="interfaceName" column="interfaceName" jdbcType="VARCHAR"/>
             <result property="interfaceDescription" column="interfaceDescription" jdbcType="VARCHAR"/>
             <result property="interfaceUrl" column="interfaceUrl" jdbcType="VARCHAR"/>
-            <result property="interfaceType" column="interfaceType" jdbcType="INTEGER"/>
+            <result property="interfaceType" column="interfaceType" jdbcType="VARCHAR"/>
             <result property="interfaceParams" column="interfaceParams" jdbcType="VARCHAR"/>
             <result property="interfaceStatus" column="interfaceStatus" jdbcType="INTEGER"/>
             <result property="interfaceRequestHeader" column="interfaceRequestHeader" jdbcType="VARCHAR"/>
