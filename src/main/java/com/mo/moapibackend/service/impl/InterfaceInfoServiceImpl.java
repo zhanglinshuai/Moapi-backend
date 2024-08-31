@@ -1,10 +1,11 @@
 package com.mo.moapibackend.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
+import com.mo.moapibackend.mapper.InterfaceInfoMapper;
 import com.mo.moapibackend.model.entity.InterfaceInfo;
 import com.mo.moapibackend.model.entity.User;
 import com.mo.moapibackend.model.request.interfaceInfo.OffLineInterfaceRequestParams;
@@ -12,13 +13,12 @@ import com.mo.moapibackend.model.request.interfaceInfo.OnLineInterfaceRequestPar
 import com.mo.moapibackend.model.request.interfaceInfo.QueryInterfaceInfoRequestParams;
 import com.mo.moapibackend.model.request.interfaceInfo.UpdateInterfaceInfoRequestParams;
 import com.mo.moapibackend.service.InterfaceInfoService;
-import com.mo.moapibackend.mapper.InterfaceInfoMapper;
+import com.mo.moapisdk.client.MoapiClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,49 +40,42 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
 
     @Override
-    public boolean verifyRequestParams(OnLineInterfaceRequestParams params, HttpServletRequest request) {
+    public int onLineInterfaceInfo(OnLineInterfaceRequestParams onLineInterfaceRequestParams, HttpServletRequest request) {
         //参数非空判断
-        if (params==null){
+        if (onLineInterfaceRequestParams==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"上线接口的参数为空");
         }
-        String interfaceDescription = params.getInterfaceDescription();
-        String interfaceName = params.getInterfaceName();
-        String interfaceResponseHeader = params.getInterfaceResponseHeader();
-        String interfaceParams = params.getInterfaceParams();
-        Integer interfaceStatus = params.getInterfaceStatus();
-        String interfaceType = params.getInterfaceType();
-        String interfaceUrl = params.getInterfaceUrl();
-        String interfaceRequestHeader = params.getInterfaceRequestHeader();
-        Long userId = params.getUserId();
-        if (StringUtils.isAnyEmpty(interfaceRequestHeader,interfaceDescription,interfaceName,interfaceResponseHeader,interfaceParams,interfaceUrl,interfaceType)){
-            return false;
+        String interfaceDescription = onLineInterfaceRequestParams.getInterfaceDescription();
+        String interfaceName = onLineInterfaceRequestParams.getInterfaceName();
+        String interfaceResponseHeader = onLineInterfaceRequestParams.getInterfaceResponseHeader();
+        String interfaceParams = onLineInterfaceRequestParams.getInterfaceParams();
+        Integer interfaceStatus = onLineInterfaceRequestParams.getInterfaceStatus();
+        String interfaceType = onLineInterfaceRequestParams.getInterfaceType();
+        String interfaceUrl = onLineInterfaceRequestParams.getInterfaceUrl();
+        String interfaceRequestHeader = onLineInterfaceRequestParams.getInterfaceRequestHeader();
+        Long userId = onLineInterfaceRequestParams.getUserId();
+        if (StringUtils.isAnyEmpty(interfaceRequestHeader,interfaceDescription,interfaceName,interfaceResponseHeader,interfaceUrl,interfaceType)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口信息为空");
         }
         if (interfaceStatus==null || interfaceStatus<=0){
-            return false;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口状态错误");
         }
         if (request==null){
-            return false;
+           throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
         if (attribute==null){
-            return false;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //用户是管理员或者当前登录用户与传入的用户id相同
         User user = (User) attribute;
-        if (!user.getUserRole().equals("管理员") || user.getId()!= userId){
+        if (!user.getUserRole().equals("管理员") || !user.getId().equals(userId)){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"该用户不是管理员!");
         }
-        return true;
-    }
-
-    @Override
-    public int onLineInterfaceInfo(OnLineInterfaceRequestParams onLineInterfaceRequestParams, HttpServletRequest request) {
-        boolean result = verifyRequestParams(onLineInterfaceRequestParams, request);
-        if (!result){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数不符合要求");
-        }
         // todo 测试调用接口
-
+        MoapiClient moapiClient = new MoapiClient(user.getAccessKey(), user.getSecretKey());
+        String userNamePost = moapiClient.getUserNamePost("zhang");
+        System.out.println("interfaceInfo" + userNamePost);
         //测试通了，将状态改为上线
         InterfaceInfo interfaceInfo = new InterfaceInfo();
         interfaceInfo.setUserId(onLineInterfaceRequestParams.getUserId());
@@ -105,17 +98,24 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
 
     @Override
     public int offLineInterfaceInfo(OffLineInterfaceRequestParams offLineInterfaceRequestParams, HttpServletRequest request) {
-        //接口参数判断
-        boolean result = verifyRequestParams(offLineInterfaceRequestParams, request);
-        if (!result){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数不符合要求");
+        if (offLineInterfaceRequestParams==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Integer interfaceId = offLineInterfaceRequestParams.getId();
-        if (interfaceId==null || interfaceId<=0){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口信息错误");
+        String interfaceDescription = offLineInterfaceRequestParams.getInterfaceDescription();
+        String interfaceParams = offLineInterfaceRequestParams.getInterfaceParams();
+        String interfaceName = offLineInterfaceRequestParams.getInterfaceName();
+        String interfaceUrl = offLineInterfaceRequestParams.getInterfaceUrl();
+        String interfaceType = offLineInterfaceRequestParams.getInterfaceType();
+        if (StringUtils.isAnyEmpty(interfaceDescription,interfaceName,interfaceUrl,interfaceType)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口参数为空");
         }
         //从数据库中查询接口是否存在
-        InterfaceInfo interfaceInfo = interfaceInfoMapper.selectById(interfaceId);
+        QueryWrapper<InterfaceInfo> interfaceInfoQueryWrapper = new QueryWrapper<InterfaceInfo>().eq("interfaceDescription", interfaceDescription)
+                .eq("interfaceName", interfaceName)
+                .eq("interfaceUrl", interfaceUrl)
+                .eq("interfaceType", interfaceType)
+                .eq("interfaceParams", interfaceParams);
+        InterfaceInfo interfaceInfo = interfaceInfoMapper.selectOne(interfaceInfoQueryWrapper);
         if (interfaceInfo==null){
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"没找到此接口");
         }
@@ -154,7 +154,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         }
         User user = (User) attribute;
         Long loginUserId = user.getId();
-        if (userId!=loginUserId || !user.getUserRole().equals("管理员")){
+        if (!userId.equals(loginUserId) || !user.getUserRole().equals("管理员")){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"该用户没有权限修改接口信息");
         }
         //根据interfaceName,interfaceDescription,interfaceUrl,interfaceType,interfaceParams来查询唯一的接口
@@ -194,10 +194,25 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         QueryWrapper<InterfaceInfo> interfaceInfoQueryWrapper = new QueryWrapper<>();
         interfaceInfoQueryWrapper.eq("interfaceName", interfaceName);
         List<InterfaceInfo> interfaceInfos = interfaceInfoMapper.selectList(interfaceInfoQueryWrapper);
-        if (CollectionUtil.isEmpty(interfaceInfos)){
+        if (CollUtil.isEmpty(interfaceInfos)){
             return new ArrayList<>();
         }
         return interfaceInfos;
+    }
+
+    @Override
+    public List<InterfaceInfo> getAllUsableInterfaceInfo(HttpServletRequest request) {
+        if (request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        QueryWrapper<InterfaceInfo> interfaceInfoQueryWrapper = new QueryWrapper<>();
+        //select * from interfaceInfo where interfaceStatus = 1;
+        interfaceInfoQueryWrapper.last("interfaceStatus = 0");
+        List<InterfaceInfo> UsableInterfaceList = interfaceInfoMapper.selectList(interfaceInfoQueryWrapper);
+        if (CollUtil.isEmpty(UsableInterfaceList)){
+            return new ArrayList<>();
+        }
+        return UsableInterfaceList;
     }
 }
 

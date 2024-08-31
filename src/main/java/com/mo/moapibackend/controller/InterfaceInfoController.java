@@ -1,6 +1,7 @@
 package com.mo.moapibackend.controller;
 
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.mo.moapibackend.exception.BaseResponse;
 import com.mo.moapibackend.exception.BusinessException;
@@ -38,9 +39,8 @@ public class InterfaceInfoController {
 
     @PostMapping("/onLine")
     public BaseResponse<Integer> onLineInterfaceInfo(OnLineInterfaceRequestParams onLineInterfaceRequestParams, HttpServletRequest request) {
-        boolean result = interfaceInfoService.verifyRequestParams(onLineInterfaceRequestParams, request);
-        if (!result){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数不符合要求");
+        if (onLineInterfaceRequestParams == null || request == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         int interfaceInfoId = interfaceInfoService.onLineInterfaceInfo(onLineInterfaceRequestParams, request);
         if (interfaceInfoId<=0){
@@ -51,9 +51,8 @@ public class InterfaceInfoController {
 
     @PostMapping("/offLine")
     public BaseResponse<Integer> offLineInterfaceInfo(OffLineInterfaceRequestParams offLineInterfaceRequestParams, HttpServletRequest request) {
-        boolean result = interfaceInfoService.verifyRequestParams(offLineInterfaceRequestParams, request);
-        if (!result){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数不符合要求");
+        if (offLineInterfaceRequestParams == null || request == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         int offLineResult = interfaceInfoService.offLineInterfaceInfo(offLineInterfaceRequestParams, request);
         if (offLineResult<=0){
@@ -82,5 +81,16 @@ public class InterfaceInfoController {
             return ResultUtils.success(new ArrayList<>());
         }
         return ResultUtils.success(interfaceInfoList);
+    }
+    @GetMapping("/usable")
+    public BaseResponse<List<InterfaceInfo>> getAllUsableInterfaceInfo(HttpServletRequest request){
+        if (request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        List<InterfaceInfo> allUsableInterfaceInfo = interfaceInfoService.getAllUsableInterfaceInfo(request);
+        if (CollUtil.isEmpty(allUsableInterfaceInfo)){
+            return ResultUtils.success(new ArrayList<>());
+        }
+        return ResultUtils.success(allUsableInterfaceInfo);
     }
 }

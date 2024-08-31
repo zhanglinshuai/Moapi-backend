@@ -10,14 +10,33 @@ import java.io.Serializable;
  * 下线接口的参数
  */
 @Data
-public class OffLineInterfaceRequestParams extends OnLineInterfaceRequestParams implements Serializable {
+public class OffLineInterfaceRequestParams  implements Serializable {
 
     private static final long serialVersionUID = 2130976778686990832L;
 
     /**
-     * 接口id
+     * 接口名称
      */
-    @TableId(type = IdType.AUTO)
-    private Integer id;
+    private String interfaceName;
+
+    /**
+     * 接口描述
+     */
+    private String interfaceDescription;
+
+    /**
+     * 接口路径
+     */
+    private String interfaceUrl;
+
+    /**
+     * 接口请求类型
+     */
+    private String interfaceType;
+
+    /**
+     * 接口参数
+     */
+    private String interfaceParams;
 
 }

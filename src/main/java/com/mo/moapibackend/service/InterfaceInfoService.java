@@ -17,15 +17,6 @@ import java.util.List;
 */
 public interface InterfaceInfoService extends IService<InterfaceInfo> {
 
-
-    /**
-     * 验证请求参数
-     * @param params
-     * @param request
-     * @return
-     */
-    boolean verifyRequestParams(OnLineInterfaceRequestParams params, HttpServletRequest request);
-
     /**
      * 创建接口
      * @param onLineInterfaceRequestParams
@@ -54,4 +45,11 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return
      */
     List<InterfaceInfo> queryInterfaceInfo(QueryInterfaceInfoRequestParams queryInterfaceInfoRequestParams);
+
+    /**
+     * 获取所有 接口状态为0的接口
+     * @param request
+     * @return
+     */
+    List<InterfaceInfo> getAllUsableInterfaceInfo(HttpServletRequest request);
 }
