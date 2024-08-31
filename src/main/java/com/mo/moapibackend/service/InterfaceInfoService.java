@@ -62,4 +62,12 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return
      */
     Page<InterfaceInfo> getAllInterfaceInfo(PageRequestParams params,HttpServletRequest request);
+
+    /**
+     * 删除接口
+     * @param interfaceInfoIds
+     * @param request
+     * @return
+     */
+    boolean DeleteInterfaceInfo(List<Integer> interfaceInfoIds, HttpServletRequest request);
 }

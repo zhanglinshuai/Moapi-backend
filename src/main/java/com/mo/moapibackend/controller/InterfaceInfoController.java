@@ -107,4 +107,16 @@ public class InterfaceInfoController {
         }
         return ResultUtils.success(allInterfaceInfo);
     }
+
+    @DeleteMapping("/deleteBulk")
+    public BaseResponse<Boolean> deleteInterfaceInfo(List<Integer> interfaceInfoIds, HttpServletRequest request){
+        if ( CollUtil.isEmpty(interfaceInfoIds)|| request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        boolean result = interfaceInfoService.DeleteInterfaceInfo(interfaceInfoIds, request);
+        if (!result){
+            return ResultUtils.success(false);
+        }
+        return ResultUtils.success(true);
+    }
 }

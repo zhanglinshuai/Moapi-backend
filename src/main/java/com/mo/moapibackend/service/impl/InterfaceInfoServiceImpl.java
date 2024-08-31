@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mo.moapibackend.commons.UserConstants.LOGIN_STATUS;
 
@@ -241,6 +242,30 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口列表为空");
         }
         return pageList;
+    }
+
+    @Override
+    public boolean DeleteInterfaceInfo(List<Integer> interfaceInfoIds, HttpServletRequest request) {
+        if(CollUtil.isEmpty(interfaceInfoIds)|| request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //只有是管理员才能删除
+        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
+        if (attribute==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User user = (User) attribute;
+        if (!user.getUserRole().equals("管理员")){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"该用户不是管理员");
+        }
+        interfaceInfoIds.stream().map((id)->{
+            int deleteById = interfaceInfoMapper.deleteById(id);
+            if (deleteById<=0){
+               throw new BusinessException(ErrorCode.SYSTEM_ERROR,"删除失败");
+            }
+            return true;
+        });
+        return true;
     }
 }
 
