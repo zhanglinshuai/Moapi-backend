@@ -1,7 +1,9 @@
 package com.mo.moapibackend.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.moapibackend.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mo.moapibackend.model.request.Page.PageRequestParams;
 import com.mo.moapibackend.model.request.interfaceInfo.OffLineInterfaceRequestParams;
 import com.mo.moapibackend.model.request.interfaceInfo.OnLineInterfaceRequestParams;
 import com.mo.moapibackend.model.request.interfaceInfo.QueryInterfaceInfoRequestParams;
@@ -52,4 +54,12 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return
      */
     List<InterfaceInfo> getAllUsableInterfaceInfo(HttpServletRequest request);
+
+    /**
+     * 分页查询所有的接口信息
+     * @param request
+     * @param params
+     * @return
+     */
+    Page<InterfaceInfo> getAllInterfaceInfo(PageRequestParams params,HttpServletRequest request);
 }

@@ -3,25 +3,26 @@ package com.mo.moapibackend.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.moapibackend.exception.BaseResponse;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
 import com.mo.moapibackend.exception.ResultUtils;
 import com.mo.moapibackend.model.entity.InterfaceInfo;
+import com.mo.moapibackend.model.request.Page.PageRequestParams;
 import com.mo.moapibackend.model.request.interfaceInfo.OffLineInterfaceRequestParams;
 import com.mo.moapibackend.model.request.interfaceInfo.OnLineInterfaceRequestParams;
 import com.mo.moapibackend.model.request.interfaceInfo.QueryInterfaceInfoRequestParams;
 import com.mo.moapibackend.model.request.interfaceInfo.UpdateInterfaceInfoRequestParams;
 import com.mo.moapibackend.service.InterfaceInfoService;
 import com.mo.moapibackend.service.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -29,6 +30,8 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/interfaceInfo")
+@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+@Slf4j
 public class InterfaceInfoController {
 
     @Resource
@@ -92,5 +95,16 @@ public class InterfaceInfoController {
             return ResultUtils.success(new ArrayList<>());
         }
         return ResultUtils.success(allUsableInterfaceInfo);
+    }
+    @GetMapping("/page")
+    public BaseResponse<Page<InterfaceInfo>> getAllInterfaceInfo(PageRequestParams params, HttpServletRequest request){
+        if (params==null || request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Page<InterfaceInfo> allInterfaceInfo = interfaceInfoService.getAllInterfaceInfo(params, request);
+        if (allInterfaceInfo.getSize()<=0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"接口列表为空");
+        }
+        return ResultUtils.success(allInterfaceInfo);
     }
 }
