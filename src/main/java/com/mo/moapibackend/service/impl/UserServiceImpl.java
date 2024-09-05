@@ -21,9 +21,11 @@ import com.mo.moapibackend.model.dto.UserDTO;
 import com.mo.moapibackend.model.entity.User;
 import com.mo.moapibackend.model.request.Page.PageRequestParams;
 import com.mo.moapibackend.model.request.user.UpdatePasswordParams;
+import com.mo.moapibackend.model.request.user.UpdateUserInfo;
 import com.mo.moapibackend.service.TokenService;
 import com.mo.moapibackend.service.UserService;
 import com.mo.moapibackend.mapper.UserMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +48,7 @@ import static com.mo.moapibackend.commons.UserConstants.*;
 * @createDate 2024-08-26 21:21:06
 */
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     implements UserService{
 
@@ -188,11 +192,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public boolean userExit(HttpServletRequest request) {
+    public boolean userExit(HttpServletRequest request,HttpServletResponse response) {
         if (request==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         request.getSession().removeAttribute(LOGIN_STATUS);
+
         return true;
     }
 
@@ -266,6 +271,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"更新失败");
         }
         return result;
+    }
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public User updateUserInfo(UpdateUserInfo updateUserInfo, HttpServletRequest request) {
+        if (updateUserInfo==null ||request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String userName = updateUserInfo.getUserName();
+        String userAccount = updateUserInfo.getUserAccount();
+        String userIntroduce = updateUserInfo.getUserIntroduce();
+        String userAvatar = updateUserInfo.getUserAvatar();
+        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
+        if (attribute==null){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        User loginUser = (User) attribute;
+        Long userId = loginUser.getId();
+        if (userId == null || userId<=0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User user = this.getById(userId);
+        user.setUserAccount(userAccount);
+        user.setUserName(userName);
+        user.setUserIntroduce(userIntroduce);
+        user.setUserAvatar(userAvatar);
+        //设置数据成功,更新数据库
+        boolean result = this.updateById(user);
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("userAccount",userAccount);
+        Long count = userMapper.selectCount(userQueryWrapper);
+        if (count>=2){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户账号重复");
+        }
+        if (!result){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        return user;
     }
 }
 

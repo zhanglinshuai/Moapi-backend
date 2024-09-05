@@ -9,6 +9,7 @@ import com.mo.moapibackend.exception.ResultUtils;
 import com.mo.moapibackend.model.entity.User;
 import com.mo.moapibackend.model.request.Page.PageRequestParams;
 import com.mo.moapibackend.model.request.user.UpdatePasswordParams;
+import com.mo.moapibackend.model.request.user.UpdateUserInfo;
 import com.mo.moapibackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -75,11 +76,11 @@ public class UserController {
 
     @PostMapping("/exit")
     @Operation(summary = "用户退出登录")
-    public BaseResponse<Boolean> userExit(HttpServletRequest request){
-        if (request==null){
+    public BaseResponse<Boolean> userExit(HttpServletRequest request,HttpServletResponse response){
+        if (request==null|| response==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean result = userService.userExit(request);
+        boolean result = userService.userExit(request,response);
         if (!result){
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"退出登录失败");
         }
@@ -113,5 +114,17 @@ public class UserController {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"更新错误");
         }
         return ResultUtils.success(result);
+    }
+
+    @PostMapping("/update/userInfo")
+    public BaseResponse<User> updateUserInfo(@RequestBody UpdateUserInfo updateUserInfo, HttpServletRequest request){
+        if (updateUserInfo==null ||request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User user = userService.updateUserInfo(updateUserInfo, request);
+        if (user==null){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+        }
+        return ResultUtils.success(user);
     }
 }

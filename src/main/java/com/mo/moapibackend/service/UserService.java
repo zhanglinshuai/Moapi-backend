@@ -8,6 +8,7 @@ import com.mo.moapibackend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mo.moapibackend.model.request.Page.PageRequestParams;
 import com.mo.moapibackend.model.request.user.UpdatePasswordParams;
+import com.mo.moapibackend.model.request.user.UpdateUserInfo;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +60,7 @@ public interface UserService extends IService<User> {
      * @param request
      * @return
      */
-    boolean userExit(HttpServletRequest request);
+    boolean userExit(HttpServletRequest request,HttpServletResponse response);
 
     /**
      * 获取所有用户信息（仅管理员）
@@ -75,4 +76,13 @@ public interface UserService extends IService<User> {
      * @return
      */
     boolean updatePassword(UpdatePasswordParams updatePasswordParams, HttpServletRequest request);
+
+    /**
+     * 更新用户信息
+     * @param updateUserInfo
+     * @param request
+     * @return
+     */
+    User updateUserInfo(UpdateUserInfo updateUserInfo,HttpServletRequest request);
+
 }
