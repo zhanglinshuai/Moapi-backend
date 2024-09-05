@@ -11,6 +11,7 @@ import com.mo.moapibackend.model.request.user.UpdatePasswordParams;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -33,9 +34,11 @@ public interface UserService extends IService<User> {
      * 用户登录
      * @param userAccount
      * @param userPassword
+     * @param request
+     * @param response
      * @return
      */
-    User userLogin(String userAccount, String userPassword,HttpServletRequest request);
+    User userLogin(String userAccount, String userPassword, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * 获取当前登录用户

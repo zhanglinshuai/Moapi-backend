@@ -3,7 +3,6 @@ package com.mo.moapibackend;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.moapibackend.model.entity.InterfaceInfo;
 import com.mo.moapibackend.service.InterfaceInfoService;
-import com.mo.moapisdk.client.MoapiClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

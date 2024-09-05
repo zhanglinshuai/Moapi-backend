@@ -1,6 +1,7 @@
 package com.mo.moapibackend.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mo.moapibackend.annotation.UserLoginToken;
 import com.mo.moapibackend.exception.BaseResponse;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
@@ -44,13 +46,13 @@ public class UserController {
     }
     @PostMapping("/login")
     @Operation(summary = "用户登录")
-    public BaseResponse<User> userLogin(String userAccount, String userPassword, HttpServletRequest request){
+    public BaseResponse<User> userLogin(String userAccount, String userPassword, HttpServletRequest request, HttpServletResponse response){
         //参数非空判断
         if (StringUtils.isAnyEmpty(userAccount,userPassword)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
         }
         //调用业务
-        User user = userService.userLogin(userAccount, userPassword, request);
+        User user = userService.userLogin(userAccount, userPassword, request,response);
         if (user==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"没有该用户信息，请先注册");
         }
@@ -84,7 +86,7 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
-
+    @UserLoginToken
     @GetMapping("/list")
     public BaseResponse<Page<User>> getUserList(PageRequestParams params,HttpServletRequest request){
         if (request==null){

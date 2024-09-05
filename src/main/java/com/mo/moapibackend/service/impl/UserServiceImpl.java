@@ -8,9 +8,12 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SignUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpRequest;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.JsonObject;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
 import com.mo.moapibackend.exception.ResultUtils;
@@ -18,6 +21,7 @@ import com.mo.moapibackend.model.dto.UserDTO;
 import com.mo.moapibackend.model.entity.User;
 import com.mo.moapibackend.model.request.Page.PageRequestParams;
 import com.mo.moapibackend.model.request.user.UpdatePasswordParams;
+import com.mo.moapibackend.service.TokenService;
 import com.mo.moapibackend.service.UserService;
 import com.mo.moapibackend.mapper.UserMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +30,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +51,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Resource
     private UserMapper userMapper;
 
+    @Resource
+    private TokenService tokenService;
 
     @Override
     public Long userRegister(String userAccount, String userPassword,String checkPassword){
@@ -96,7 +104,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public User userLogin(String userAccount, String userPassword,HttpServletRequest request) {
+    public User userLogin(String userAccount, String userPassword, HttpServletRequest request, HttpServletResponse response) {
         //非空判断
         if (StringUtils.isAnyEmpty(userAccount, userPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号或密码为空");
@@ -132,6 +140,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         User safetyUser = getSafetyUser(user);
         //将用户登录态存储到session中
         request.getSession().setAttribute(LOGIN_STATUS,safetyUser);
+        JSONObject jsonObject = new JSONObject();
+        String token = tokenService.getToken(user);
+        jsonObject.put("token", token);
+        Cookie cookie = new Cookie("token", token);
+        cookie.setPath("/");
+        response.addCookie(cookie);
         return safetyUser;
     }
 
@@ -181,6 +195,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         request.getSession().removeAttribute(LOGIN_STATUS);
         return true;
     }
+
+
 
     @Override
     public Page<User> getUserList(PageRequestParams params,HttpServletRequest request) {
