@@ -1,20 +1,22 @@
 package com.mo.moapibackend.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
 import com.mo.moapibackend.mapper.InterfaceInfoMapper;
 import com.mo.moapibackend.model.entity.InterfaceInfo;
 import com.mo.moapibackend.model.entity.User;
 import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.OffLineInterfaceRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.OnLineInterfaceRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.QueryInterfaceInfoRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.UpdateInterfaceInfoRequestParams;
+import com.mo.moapibackend.model.request.interfaceInfo.*;
 import com.mo.moapibackend.service.InterfaceInfoService;
+import com.mo.moapibackend.service.UserService;
 import com.mo.moapisdk.client.MoapiClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -22,10 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.mo.moapibackend.commons.UserConstants.LOGIN_STATUS;
 
@@ -42,6 +41,8 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
     @Resource
     private InterfaceInfoMapper interfaceInfoMapper;
 
+    @Resource
+    private UserService userService;
 
     @Override
     public int onLineInterfaceInfo(OnLineInterfaceRequestParams onLineInterfaceRequestParams, HttpServletRequest request) {
@@ -266,6 +267,47 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
             return true;
         });
         return true;
+    }
+
+    @Override
+    public InterfaceInfo getInterfaceInfoById(Integer id, HttpServletRequest request) {
+        if (id==null || request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        InterfaceInfo info = interfaceInfoMapper.selectById(id);
+        if (info==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        return info;
+    }
+
+    @Override
+    public Object invokeInterfaceInfo(InvokeInterfaceInfoRequestParams params, HttpServletRequest request) {
+        if (params==null || request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String interfaceParams = params.getInterfaceParams();
+        Integer id = params.getId();
+        if (id==null || id<=0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        if (interfaceParams==null || interfaceParams.isEmpty()){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        InterfaceInfo interfaceInfo = interfaceInfoMapper.selectById(id);
+        if (interfaceInfo==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User currentUser = userService.getCurrentUser(request);
+        String accessKey = currentUser.getAccessKey();
+        String secretKey = currentUser.getSecretKey();
+        MoapiClient moapiClient = new MoapiClient(accessKey, secretKey);
+
+        String userNamePost = moapiClient.getUserNamePost(interfaceParams);
+        if (userNamePost==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"调用失败");
+        }
+        return userNamePost;
     }
 }
 

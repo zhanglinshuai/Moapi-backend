@@ -37,3 +37,18 @@ create table interface_info
     updateTime              datetime default CURRENT_TIMESTAMP not null comment '更新时间'
 )
     comment '接口信息表';
+-- auto-generated definition
+create table user_interfaceinfo
+(
+    id              int auto_increment comment 'id'
+        primary key,
+    userId          int                                null comment '用户id',
+    status          int                      not null comment '接口状态 0-禁用 1 -正常',
+    interfaceInfoId int                                null comment '接口id',
+    totalNumber     int                                null comment '总调用次数',
+    residualNumber  int                                null comment '剩余调用次数',
+    createTime      datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime      datetime default CURRENT_TIMESTAMP not null comment '更新时间',
+    isDelete        int      default 0                 not null comment '是否删除 0-不删除 1-删除'
+)
+    comment '用户接口信息表';

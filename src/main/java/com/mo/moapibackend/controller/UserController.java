@@ -1,11 +1,13 @@
 package com.mo.moapibackend.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.moapibackend.exception.BaseResponse;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
 import com.mo.moapibackend.exception.ResultUtils;
-import com.mo.moapibackend.model.dto.UserDTO;
 import com.mo.moapibackend.model.entity.User;
+import com.mo.moapibackend.model.request.Page.PageRequestParams;
+import com.mo.moapibackend.model.request.user.UpdatePasswordParams;
 import com.mo.moapibackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +16,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
 @Slf4j
-@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
 
     @Resource
@@ -81,4 +84,32 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
+
+    @GetMapping("/list")
+    public BaseResponse<Page<User>> getUserList(PageRequestParams params,HttpServletRequest request){
+        if (request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Page<User> userList = userService.getUserList(params, request);
+
+        return ResultUtils.success(userList);
+    }
+
+    @PostMapping("/update")
+    public BaseResponse<Boolean> updatePassword(UpdatePasswordParams updatePasswordParams, HttpServletRequest request){
+        if (updatePasswordParams==null || request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String oldPassword = updatePasswordParams.getOldPassword();
+        String newPassword = updatePasswordParams.getNewPassword();
+        String checkPassword = updatePasswordParams.getCheckPassword();
+        if (StringUtils.isAnyEmpty(oldPassword,newPassword,checkPassword)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
+        }
+        boolean result = userService.updatePassword(updatePasswordParams, request);
+        if (!result){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"更新错误");
+        }
+        return ResultUtils.success(result);
+    }
 }

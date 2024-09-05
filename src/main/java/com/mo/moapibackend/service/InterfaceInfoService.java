@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.moapibackend.model.entity.InterfaceInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.OffLineInterfaceRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.OnLineInterfaceRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.QueryInterfaceInfoRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.UpdateInterfaceInfoRequestParams;
+import com.mo.moapibackend.model.request.interfaceInfo.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -70,4 +67,20 @@ public interface InterfaceInfoService extends IService<InterfaceInfo> {
      * @return
      */
     boolean DeleteInterfaceInfo(List<Integer> interfaceInfoIds, HttpServletRequest request);
+
+    /**
+     * 根据接口id获取接口信息
+     * @param id
+     * @param request
+     * @return
+     */
+    InterfaceInfo getInterfaceInfoById(Integer id, HttpServletRequest request);
+
+    /**
+     * 在线调用测试
+     * @param params
+     * @param request
+     * @return
+     */
+    Object invokeInterfaceInfo(InvokeInterfaceInfoRequestParams params, HttpServletRequest request);
 }

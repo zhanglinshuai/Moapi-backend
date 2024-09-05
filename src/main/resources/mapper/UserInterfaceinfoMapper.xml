@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mo.moapibackend.mapper.UserInterfaceinfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.mo.moapibackend.model.entity.UserInterfaceinfo">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="userId" column="userId" jdbcType="INTEGER"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="interfaceInfoId" column="interfaceInfoId" jdbcType="INTEGER"/>
+            <result property="totalNumber" column="totalNumber" jdbcType="INTEGER"/>
+            <result property="residualNumber" column="residualNumber" jdbcType="INTEGER"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,userId,status,
+        interfaceInfoId,totalNumber,residualNumber,
+        createTime,updateTime,isDelete
+    </sql>
+</mapper>

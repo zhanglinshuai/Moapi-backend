@@ -1,26 +1,33 @@
 package com.mo.moapibackend.service.impl;
+import java.util.Collections;
 import java.util.Date;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SignUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpRequest;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
 import com.mo.moapibackend.exception.ResultUtils;
 import com.mo.moapibackend.model.dto.UserDTO;
 import com.mo.moapibackend.model.entity.User;
+import com.mo.moapibackend.model.request.Page.PageRequestParams;
+import com.mo.moapibackend.model.request.user.UpdatePasswordParams;
 import com.mo.moapibackend.service.UserService;
 import com.mo.moapibackend.mapper.UserMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -173,6 +180,76 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         request.getSession().removeAttribute(LOGIN_STATUS);
         return true;
+    }
+
+    @Override
+    public Page<User> getUserList(PageRequestParams params,HttpServletRequest request) {
+        if(request==null || params == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        int currentPage = params.getCurrentPage();
+        int pageSize = params.getPageSize();
+        if (currentPage<=0 || pageSize <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
+        if (attribute==null){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        User loginUser = (User) attribute;
+        if (!loginUser.getUserRole().equals("管理员")){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"该用户不是管理员");
+        }
+        Page<User> userPage = new Page<>(currentPage, pageSize);
+        Page<User> page = this.page(userPage);
+        if (page==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户列表为空");
+        }
+        return page;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean updatePassword(UpdatePasswordParams updatePasswordParams, HttpServletRequest request) {
+        if (updatePasswordParams==null || request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String oldPassword = updatePasswordParams.getOldPassword();
+        String newPassword = updatePasswordParams.getNewPassword();
+        String checkPassword = updatePasswordParams.getCheckPassword();
+        if (StringUtils.isAnyEmpty(oldPassword,newPassword,checkPassword)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
+        }
+        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
+        if (attribute==null){
+            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
+        }
+        User loginUser = (User) attribute;
+        //获取当前登录用户id
+        Long userId = loginUser.getId();
+        if (userId == null || userId<=0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户信息错误");
+        }
+        if (!newPassword.equals(checkPassword)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"新密码和校验密码不相同");
+        }
+        User user = this.getById(userId);
+        String userPassword = user.getUserPassword();
+        String safetyOldPass = DigestUtil.md5Hex((PASSWORD_SALT + oldPassword).getBytes());
+        if (!safetyOldPass.equals(userPassword)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"原密码错误");
+        }
+        if (oldPassword.equals(newPassword)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"修改前后密码一致");
+        }
+        //修改成功，更新数据库
+        String safetyPassword = DigestUtil.md5Hex((PASSWORD_SALT + newPassword).getBytes());
+        user.setUserPassword(safetyPassword);
+        boolean result = this.updateById(user);
+        if (!result){
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"更新失败");
+        }
+        return result;
     }
 }
 

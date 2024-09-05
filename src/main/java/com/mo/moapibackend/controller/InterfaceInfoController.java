@@ -3,6 +3,8 @@ package com.mo.moapibackend.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.moapibackend.exception.BaseResponse;
 import com.mo.moapibackend.exception.BusinessException;
@@ -10,10 +12,7 @@ import com.mo.moapibackend.exception.ErrorCode;
 import com.mo.moapibackend.exception.ResultUtils;
 import com.mo.moapibackend.model.entity.InterfaceInfo;
 import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.OffLineInterfaceRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.OnLineInterfaceRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.QueryInterfaceInfoRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.UpdateInterfaceInfoRequestParams;
+import com.mo.moapibackend.model.request.interfaceInfo.*;
 import com.mo.moapibackend.service.InterfaceInfoService;
 import com.mo.moapibackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,7 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/interfaceInfo")
-@CrossOrigin(origins = "http://localhost:8000", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @Slf4j
 public class InterfaceInfoController {
 
@@ -41,7 +39,7 @@ public class InterfaceInfoController {
     private InterfaceInfoService interfaceInfoService;
 
     @PostMapping("/onLine")
-    public BaseResponse<Integer> onLineInterfaceInfo(OnLineInterfaceRequestParams onLineInterfaceRequestParams, HttpServletRequest request) {
+    public BaseResponse<Integer> onLineInterfaceInfo(@RequestBody OnLineInterfaceRequestParams onLineInterfaceRequestParams, HttpServletRequest request) {
         if (onLineInterfaceRequestParams == null || request == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -109,7 +107,7 @@ public class InterfaceInfoController {
     }
 
     @DeleteMapping("/deleteBulk")
-    public BaseResponse<Boolean> deleteInterfaceInfo(List<Integer> interfaceInfoIds, HttpServletRequest request){
+    public BaseResponse<Boolean> deleteInterfaceInfo( List<Integer> interfaceInfoIds, HttpServletRequest request){
         if ( CollUtil.isEmpty(interfaceInfoIds)|| request==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -119,4 +117,42 @@ public class InterfaceInfoController {
         }
         return ResultUtils.success(true);
     }
+
+    @GetMapping("/selectById")
+    public BaseResponse<InterfaceInfo> selectInterfaceById(Integer id, HttpServletRequest request){
+        if (id==null || request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        InterfaceInfo interfaceInfoById = interfaceInfoService.getInterfaceInfoById(id, request);
+        if (interfaceInfoById==null){
+            return ResultUtils.success(null);
+        }
+        return ResultUtils.success(interfaceInfoById);
+    }
+
+    @GetMapping("/length")
+    public BaseResponse<Integer> getInterfaceInfoSize(){
+        List<InterfaceInfo> list = interfaceInfoService.list();
+        int size = list.size();
+        return ResultUtils.success(size);
+    }
+
+
+    @GetMapping("/invoke")
+    public BaseResponse<Object> invokeInterfaceInfo(InvokeInterfaceInfoRequestParams params, HttpServletRequest request){
+        if (params==null || request==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Integer id = params.getId();
+        String interfaceParams = params.getInterfaceParams();
+        if (id==null || interfaceParams==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        Object result = interfaceInfoService.invokeInterfaceInfo(params, request);
+        if (result==null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"调用失败");
+        }
+        return ResultUtils.success(result);
+    }
+
 }
