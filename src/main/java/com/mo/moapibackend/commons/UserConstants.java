@@ -28,4 +28,9 @@ public class UserConstants implements Serializable {
 
     private static final long serialVersionUID = 8080839610555774012L;
 
+    /**
+     * token盐值
+     */
+    public static final String TOKEN_SALT = "token";
+
 }

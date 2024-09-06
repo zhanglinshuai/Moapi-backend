@@ -10,6 +10,10 @@ import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -143,13 +147,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         User safetyUser = getSafetyUser(user);
         //将用户登录态存储到session中
-        request.getSession().setAttribute(LOGIN_STATUS,safetyUser);
         JSONObject jsonObject = new JSONObject();
         String token = tokenService.getToken(user);
         jsonObject.put("token", token);
         Cookie cookie = new Cookie("token", token);
         cookie.setPath("/");
         response.addCookie(cookie);
+        request.getSession().setAttribute(LOGIN_STATUS,token);
         return safetyUser;
     }
 
@@ -162,11 +166,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (attribute==null){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"用户未登录");
         }
-        User loginUser = (User) attribute;
-        Long id = loginUser.getId();
+        //获取token
+        String token = (String) attribute;
+        //解析token
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(TOKEN_SALT)).build();
+        DecodedJWT verify = jwtVerifier.verify(token);
+        List<String> audience = verify.getAudience();
+        //获取userId
+        String id = audience.get(0);
         User user = userMapper.selectById(id);
         if (user==null){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户信息错误");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         return getSafetyUser(user);
 
@@ -197,7 +207,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         request.getSession().removeAttribute(LOGIN_STATUS);
-
         return true;
     }
 

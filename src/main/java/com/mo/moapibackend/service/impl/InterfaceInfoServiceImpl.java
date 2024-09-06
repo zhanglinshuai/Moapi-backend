@@ -225,16 +225,6 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         if (params==null || request==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        //校验用户是不是管理员
-        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
-        if (attribute==null){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户未登录");
-        }
-        User user = (User) attribute;
-        if (!user.getUserRole().equals("管理员")){
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"该用户不是管理员");
-        }
-        //如果是管理员
         int currentPage = params.getCurrentPage();
         int pageSize = params.getPageSize();
         Page<InterfaceInfo> interfaceInfoPage = new Page<>(currentPage,pageSize);
