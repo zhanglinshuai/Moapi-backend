@@ -68,12 +68,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         if (request==null){
            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
-        if (attribute==null){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        //用户是管理员或者当前登录用户与传入的用户id相同
-        User user = (User) attribute;
+        User user = userService.getCurrentUser(request);
         if (!user.getUserRole().equals("管理员") || !user.getId().equals(userId)){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"该用户不是管理员!");
         }
@@ -153,11 +148,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"传递参数为空");
         }
         //校验是否为创建接口的userId或者为管理员
-        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
-        if (attribute==null){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        User user = (User) attribute;
+        User user = userService.getCurrentUser(request);
         Long loginUserId = user.getId();
         if (!userId.equals(loginUserId) || !user.getUserRole().equals("管理员")){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"该用户没有权限修改接口信息");
@@ -211,7 +202,9 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         QueryWrapper<InterfaceInfo> interfaceInfoQueryWrapper = new QueryWrapper<>();
-        //select * from interfaceInfo where interfaceStatus = 1;
+        //select *
+        // from interfaceInfo
+        // where interfaceStatus = 1;
         interfaceInfoQueryWrapper.last("interfaceStatus = 0");
         List<InterfaceInfo> UsableInterfaceList = interfaceInfoMapper.selectList(interfaceInfoQueryWrapper);
         if (CollUtil.isEmpty(UsableInterfaceList)){
@@ -241,11 +234,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //只有是管理员才能删除
-        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
-        if (attribute==null){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        User user = (User) attribute;
+        User user = userService.getCurrentUser(request);
         if (!user.getUserRole().equals("管理员")){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"该用户不是管理员");
         }

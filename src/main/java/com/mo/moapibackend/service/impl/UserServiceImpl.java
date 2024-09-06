@@ -222,11 +222,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (currentPage<=0 || pageSize <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
-        if (attribute==null){
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        User loginUser = (User) attribute;
+        User loginUser = getCurrentUser(request);
         if (!loginUser.getUserRole().equals("管理员")){
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"该用户不是管理员");
         }
@@ -250,11 +246,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (StringUtils.isAnyEmpty(oldPassword,newPassword,checkPassword)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
         }
-        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
-        if (attribute==null){
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        User loginUser = (User) attribute;
+        User loginUser = getCurrentUser(request);
         //获取当前登录用户id
         Long userId = loginUser.getId();
         if (userId == null || userId<=0) {
@@ -291,11 +283,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String userAccount = updateUserInfo.getUserAccount();
         String userIntroduce = updateUserInfo.getUserIntroduce();
         String userAvatar = updateUserInfo.getUserAvatar();
-        Object attribute = request.getSession().getAttribute(LOGIN_STATUS);
-        if (attribute==null){
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
-        User loginUser = (User) attribute;
+        User loginUser = getCurrentUser(request);
         Long userId = loginUser.getId();
         if (userId == null || userId<=0){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
