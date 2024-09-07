@@ -281,8 +281,9 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         String accessKey = currentUser.getAccessKey();
         String secretKey = currentUser.getSecretKey();
         MoapiClient moapiClient = new MoapiClient(accessKey, secretKey);
-
-        String userNamePost = moapiClient.getUserNamePost(interfaceParams);
+        com.mo.moapisdk.model.User user = new com.mo.moapisdk.model.User();
+        user.setName(interfaceParams);
+        String userNamePost = moapiClient.getUserNamePost(user);
         if (userNamePost==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"调用失败");
         }
