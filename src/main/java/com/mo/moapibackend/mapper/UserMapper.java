@@ -1,7 +1,8 @@
 package com.mo.moapibackend.mapper;
 
-import com.mo.moapibackend.model.entity.User;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mo.moapicommon.model.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

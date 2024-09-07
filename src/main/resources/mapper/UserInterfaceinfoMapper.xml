@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mo.moapibackend.mapper.UserInterfaceinfoMapper">
 
-    <resultMap id="BaseResultMap" type="com.mo.moapibackend.model.entity.UserInterfaceinfo">
+    <resultMap id="BaseResultMap" type="com.mo.moapicommon.model.entity.UserInterfaceinfo">
             <id property="id" column="id" jdbcType="INTEGER"/>
             <result property="userId" column="userId" jdbcType="INTEGER"/>
             <result property="status" column="status" jdbcType="INTEGER"/>

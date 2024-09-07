@@ -3,18 +3,17 @@ package com.mo.moapibackend.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mo.moapibackend.exception.BaseResponse;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
 import com.mo.moapibackend.exception.ResultUtils;
-import com.mo.moapibackend.model.entity.InterfaceInfo;
-import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.*;
+
 import com.mo.moapibackend.service.InterfaceInfoService;
 import com.mo.moapibackend.service.UserService;
+import com.mo.moapicommon.model.entity.InterfaceInfo;
+import com.mo.moapicommon.model.request.Page.PageRequestParams;
+import com.mo.moapicommon.model.request.interfaceInfo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,7 +61,7 @@ public class InterfaceInfoController {
         return ResultUtils.success(offLineResult);
     }
     @PostMapping("/update")
-    public BaseResponse<Boolean> updateInterfaceInfo(UpdateInterfaceInfoRequestParams updateInterfaceInfoRequestParams,HttpServletRequest request){
+    public BaseResponse<Boolean> updateInterfaceInfo(UpdateInterfaceInfoRequestParams updateInterfaceInfoRequestParams, HttpServletRequest request){
         if (updateInterfaceInfoRequestParams==null || request==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -71,17 +70,6 @@ public class InterfaceInfoController {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR,"更新接口信息失败");
         }
         return ResultUtils.success(result);
-    }
-    @GetMapping("/query")
-    public BaseResponse<List<InterfaceInfo>> queryInterfaceInfo(QueryInterfaceInfoRequestParams queryInterfaceInfoRequestParams){
-        if (queryInterfaceInfoRequestParams==null){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        List<InterfaceInfo> interfaceInfoList = interfaceInfoService.queryInterfaceInfo(queryInterfaceInfoRequestParams);
-        if (CollectionUtil.isEmpty(interfaceInfoList)){
-            return ResultUtils.success(new ArrayList<>());
-        }
-        return ResultUtils.success(interfaceInfoList);
     }
     @GetMapping("/usable")
     public BaseResponse<List<InterfaceInfo>> getAllUsableInterfaceInfo(HttpServletRequest request){

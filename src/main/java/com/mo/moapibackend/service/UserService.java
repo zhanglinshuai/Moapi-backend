@@ -1,19 +1,14 @@
 package com.mo.moapibackend.service;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.mo.moapibackend.model.dto.UserDTO;
-import com.mo.moapibackend.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.user.UpdatePasswordParams;
-import com.mo.moapibackend.model.request.user.UpdateUserInfo;
-import org.springframework.stereotype.Service;
+import com.mo.moapicommon.model.entity.User;
+import com.mo.moapicommon.model.request.Page.PageRequestParams;
+import com.mo.moapicommon.model.request.user.UpdatePasswordParams;
+import com.mo.moapicommon.model.request.user.UpdateUserInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 /**
 * @author 86175
@@ -67,7 +62,7 @@ public interface UserService extends IService<User> {
      * @param request
      * @return
      */
-    Page<User> getUserList(PageRequestParams params,HttpServletRequest request);
+    Page<User> getUserList(PageRequestParams params, HttpServletRequest request);
 
     /**
      * 修改密码
@@ -83,6 +78,6 @@ public interface UserService extends IService<User> {
      * @param request
      * @return
      */
-    User updateUserInfo(UpdateUserInfo updateUserInfo,HttpServletRequest request);
+    User updateUserInfo(UpdateUserInfo updateUserInfo, HttpServletRequest request);
 
 }

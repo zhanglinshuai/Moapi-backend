@@ -5,10 +5,11 @@ import com.mo.moapibackend.exception.BaseResponse;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
 import com.mo.moapibackend.exception.ResultUtils;
-import com.mo.moapibackend.model.entity.UserInterfaceinfo;
-import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.userInterfaceInfo.AddUserInterfaceInfo;
+
 import com.mo.moapibackend.service.UserInterfaceinfoService;
+import com.mo.moapicommon.model.entity.UserInterfaceinfo;
+import com.mo.moapicommon.model.request.Page.PageRequestParams;
+import com.mo.moapicommon.model.request.userInterfaceInfo.AddUserInterfaceInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +51,7 @@ public class UserInterfaceInfoController {
 
 
     @PostMapping("/update")
-    public BaseResponse<UserInterfaceinfo> updateUserInterfaceInfo(Integer userId,Integer interfaceId,Integer totalNumber,Integer ResidualNumber){
+    public BaseResponse<UserInterfaceinfo> updateUserInterfaceInfo(Integer userId, Integer interfaceId, Integer totalNumber, Integer ResidualNumber){
         if(userId == null || interfaceId == null || totalNumber == null || ResidualNumber == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }

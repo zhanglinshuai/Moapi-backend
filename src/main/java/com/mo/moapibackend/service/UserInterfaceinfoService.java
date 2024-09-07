@@ -1,12 +1,10 @@
 package com.mo.moapibackend.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.mo.moapibackend.model.entity.UserInterfaceinfo;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.userInterfaceInfo.AddUserInterfaceInfo;
-
-import java.util.List;
+import com.mo.moapicommon.model.entity.UserInterfaceinfo;
+import com.mo.moapicommon.model.request.Page.PageRequestParams;
+import com.mo.moapicommon.model.request.userInterfaceInfo.AddUserInterfaceInfo;
 
 /**
 * @author 86175
@@ -54,5 +52,13 @@ public interface UserInterfaceinfoService extends IService<UserInterfaceinfo> {
      * @param params
      * @return
      */
-    Page<UserInterfaceinfo> getUserInterfaceInfoList(PageRequestParams params,Integer userId);
+    Page<UserInterfaceinfo> getUserInterfaceInfoList(PageRequestParams params, Integer userId);
+
+    /**
+     * 调用次数
+     * @param interfaceId
+     * @param userId
+     * @return
+     */
+    boolean InvokeCount(long interfaceId,long userId);
 }

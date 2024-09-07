@@ -1,7 +1,8 @@
 package com.mo.moapibackend.mapper;
 
-import com.mo.moapibackend.model.entity.InterfaceInfo;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mo.moapicommon.model.entity.InterfaceInfo;
 
 /**
 * @author 86175

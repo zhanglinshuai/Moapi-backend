@@ -2,7 +2,7 @@ package com.mo.moapibackend.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.mo.moapibackend.model.entity.User;
+import com.mo.moapicommon.model.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;

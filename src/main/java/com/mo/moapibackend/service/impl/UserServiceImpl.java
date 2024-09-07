@@ -1,15 +1,8 @@
 package com.mo.moapibackend.service.impl;
-import java.util.Collections;
-import java.util.Date;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.crypto.SignUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -17,21 +10,17 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.gson.JsonObject;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
-import com.mo.moapibackend.exception.ResultUtils;
-import com.mo.moapibackend.model.dto.UserDTO;
-import com.mo.moapibackend.model.entity.User;
-import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.user.UpdatePasswordParams;
-import com.mo.moapibackend.model.request.user.UpdateUserInfo;
+import com.mo.moapibackend.mapper.UserMapper;
 import com.mo.moapibackend.service.TokenService;
 import com.mo.moapibackend.service.UserService;
-import com.mo.moapibackend.mapper.UserMapper;
+import com.mo.moapicommon.model.entity.User;
+import com.mo.moapicommon.model.request.Page.PageRequestParams;
+import com.mo.moapicommon.model.request.user.UpdatePasswordParams;
+import com.mo.moapicommon.model.request.user.UpdateUserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +28,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -213,7 +201,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 
     @Override
-    public Page<User> getUserList(PageRequestParams params,HttpServletRequest request) {
+    public Page<User> getUserList(PageRequestParams params, HttpServletRequest request) {
         if(request==null || params == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }

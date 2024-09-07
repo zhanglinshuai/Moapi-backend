@@ -1,20 +1,22 @@
 package com.mo.moapibackend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
-import com.mo.moapibackend.exception.ResultUtils;
-import com.mo.moapibackend.model.entity.InterfaceInfo;
-import com.mo.moapibackend.model.entity.User;
-import com.mo.moapibackend.model.entity.UserInterfaceinfo;
-import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.userInterfaceInfo.AddUserInterfaceInfo;
+
 import com.mo.moapibackend.service.InterfaceInfoService;
 import com.mo.moapibackend.service.UserInterfaceinfoService;
 import com.mo.moapibackend.mapper.UserInterfaceinfoMapper;
 import com.mo.moapibackend.service.UserService;
+import com.mo.moapicommon.model.entity.InterfaceInfo;
+import com.mo.moapicommon.model.entity.User;
+import com.mo.moapicommon.model.entity.UserInterfaceinfo;
+import com.mo.moapicommon.model.request.Page.PageRequestParams;
+import com.mo.moapicommon.model.request.userInterfaceInfo.AddUserInterfaceInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.tags.ParamTag;
@@ -138,7 +140,7 @@ public class UserInterfaceinfoServiceImpl extends ServiceImpl<UserInterfaceinfoM
     }
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Page<UserInterfaceinfo> getUserInterfaceInfoList(PageRequestParams params,Integer userId) {
+    public Page<UserInterfaceinfo> getUserInterfaceInfoList(PageRequestParams params, Integer userId) {
         if (userId==null || params==null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -157,6 +159,19 @@ public class UserInterfaceinfoServiceImpl extends ServiceImpl<UserInterfaceinfoM
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         return page;
+    }
+
+    @Override
+    public boolean InvokeCount(long interfaceId, long userId) {
+        if (interfaceId<=0 || userId<=0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // update user_interfaceInfo set userId = {} && interafaceInfoId = {} where residualNumber  = residualNumber-1
+        UpdateWrapper<UserInterfaceinfo> userInterfaceinfoQueryWrapper = new UpdateWrapper<>();
+        userInterfaceinfoQueryWrapper.eq("interfaceInfoId", interfaceId);
+        userInterfaceinfoQueryWrapper.eq("userId", userId);
+        userInterfaceinfoQueryWrapper.setSql("residualNumber  = residualNumber-1");
+        return this.update(userInterfaceinfoQueryWrapper);
     }
 }
 

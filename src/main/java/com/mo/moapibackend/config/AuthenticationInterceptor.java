@@ -7,8 +7,8 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.mo.moapibackend.annotation.PassToken;
 import com.mo.moapibackend.annotation.UserLoginToken;
-import com.mo.moapibackend.model.entity.User;
 import com.mo.moapibackend.service.UserService;
+import com.mo.moapicommon.model.entity.User;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -16,6 +16,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+
+import static com.mo.moapicommon.commons.UserConstants.TOKEN_SALT;
 
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
@@ -58,7 +60,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                     throw new RuntimeException("用户不存在，请重新登录");
                 }
                 // 验证 token
-                JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getUserPassword())).build();
+                JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(TOKEN_SALT)).build();
                 try {
                     jwtVerifier.verify(token);
                 } catch (JWTVerificationException e) {

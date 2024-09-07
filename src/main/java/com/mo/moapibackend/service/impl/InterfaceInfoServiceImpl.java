@@ -1,22 +1,19 @@
 package com.mo.moapibackend.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.mo.moapibackend.exception.BusinessException;
 import com.mo.moapibackend.exception.ErrorCode;
 import com.mo.moapibackend.mapper.InterfaceInfoMapper;
-import com.mo.moapibackend.model.entity.InterfaceInfo;
-import com.mo.moapibackend.model.entity.User;
-import com.mo.moapibackend.model.request.Page.PageRequestParams;
-import com.mo.moapibackend.model.request.interfaceInfo.*;
+
 import com.mo.moapibackend.service.InterfaceInfoService;
 import com.mo.moapibackend.service.UserService;
+import com.mo.moapicommon.model.entity.InterfaceInfo;
+import com.mo.moapicommon.model.entity.User;
+import com.mo.moapicommon.model.request.Page.PageRequestParams;
+import com.mo.moapicommon.model.request.interfaceInfo.*;
 import com.mo.moapisdk.client.MoapiClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -25,8 +22,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.mo.moapibackend.commons.UserConstants.LOGIN_STATUS;
 
 /**
 * @author 86175
@@ -181,20 +176,7 @@ public class InterfaceInfoServiceImpl extends ServiceImpl<InterfaceInfoMapper, I
         return true;
     }
 
-    @Override
-    public List<InterfaceInfo> queryInterfaceInfo(QueryInterfaceInfoRequestParams queryInterfaceInfoRequestParams) {
-        if (queryInterfaceInfoRequestParams==null){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        String interfaceName = queryInterfaceInfoRequestParams.getInterfaceName();
-        QueryWrapper<InterfaceInfo> interfaceInfoQueryWrapper = new QueryWrapper<>();
-        interfaceInfoQueryWrapper.eq("interfaceName", interfaceName);
-        List<InterfaceInfo> interfaceInfos = interfaceInfoMapper.selectList(interfaceInfoQueryWrapper);
-        if (CollUtil.isEmpty(interfaceInfos)){
-            return new ArrayList<>();
-        }
-        return interfaceInfos;
-    }
+
 
     @Override
     public List<InterfaceInfo> getAllUsableInterfaceInfo(HttpServletRequest request) {
